@@ -266,4 +266,4 @@ tools/
 artifacts/
 artifacts-*/
 
-# build/*
+build/*
