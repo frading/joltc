@@ -266,4 +266,5 @@ tools/
 artifacts/
 artifacts-*/
 
-build/*
+build/WASM_*
+build/NATIVE_*

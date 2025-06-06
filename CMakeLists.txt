@@ -90,6 +90,10 @@ option(USE_FMADD "Enable FMADD" ON)
 # See: https://caniuse.com/?search=WebAssembly%20SIMD (Safari got support in March 2023 and was the last major browser to get support).
 option(USE_WASM_SIMD "Enable SIMD for WASM" OFF)
 
+# Enable 64 bit WASM instead of the default 32 bit WASM. Note that this currently requires special commandline flags in browsers and nodejs to enable.
+# E.g. use 'node --experimental-wasm-memory64 UnitTests.js' to run the unit tests in nodejs in 64 bit.
+option(JPH_USE_WASM64 "Enable 64 bit WASM" ON)
+
 # Enable all warnings
 option(ENABLE_ALL_WARNINGS "Enable all warnings and warnings as errors" OFF)
 
@@ -107,7 +111,7 @@ option(DEBUG_RENDERER_IN_DEBUG_AND_RELEASE "Enable debug renderer in Debug and R
 option(DEBUG_RENDERER_IN_DISTRIBUTION "Enable debug renderer in all builds" ON)
 
 # Enable the profiler in Debug and Release builds. Note that PROFILER_IN_DISTRIBUTION will override this setting.
-option(PROFILER_IN_DEBUG_AND_RELEASE "Enable the profiler in Debug and Release builds" ON)
+option(PROFILER_IN_DEBUG_AND_RELEASE "Enable the profiler in Debug and Release builds" OFF)
 
 # Enable the profiler in all builds.
 # Note that enabling this reduces the performance of the library.
@@ -137,8 +141,8 @@ endif ()
 
 FetchContent_Declare(
     JoltPhysics
-    GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics"
-    GIT_TAG v5.3.0
+    GIT_REPOSITORY "https://github.com/frading/JoltPhysics"
+    GIT_TAG 912d5c0f9b67455800a56627c29a55270a610728
 	SOURCE_SUBDIR "Build"
 )
 FetchContent_MakeAvailable(JoltPhysics)
@@ -262,7 +266,7 @@ endif()
 set(CMAKE_EXE_LINKER_FLAGS_DISTRIBUTION "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 set(CMAKE_SHARED_LINKER_FLAGS_DISTRIBUTION "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
 
-SET_INTERPROCEDURAL_OPTIMIZATION()
+
 
 set(PHYSICS_REPO_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/joltc)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Disable shared library when building Jolt" FORCE)
@@ -272,6 +276,17 @@ if (IOS OR EMSCRIPTEN)
     set(JPH_BUILD_SHARED OFF CACHE BOOL "Always Disable shared library on (IOS, WEB)" FORCE)
 else()
 	option(JPH_BUILD_SHARED "Build a shared library" ${JPH_MASTER_PROJECT})
+endif()
+
+if (EMSCRIPTEN)
+	set(INTERPROCEDURAL_OPTIMIZATION OFF CACHE BOOL "Always Disable optimisation" FORCE)
+	target_compile_options(Jolt PUBLIC -pthread)
+	target_link_options(Jolt PUBLIC -pthread)
+	target_compile_options(Jolt PUBLIC -sMEMORY64=1)
+	target_link_options(Jolt PUBLIC -sMEMORY64=1)
+	target_link_options(Jolt PUBLIC -Wno-limited-postlink-optimizations)
+else()
+	SET_INTERPROCEDURAL_OPTIMIZATION()
 endif()
 
 # Setup joltc library
@@ -364,3 +379,4 @@ message(STATUS "CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
 if (CMAKE_OSX_ARCHITECTURES)
     message(STATUS "CMAKE_OSX_ARCHITECTURES: ${CMAKE_OSX_ARCHITECTURES}")
 endif ()
+

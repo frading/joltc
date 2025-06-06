@@ -151,21 +151,21 @@ static JPH_TraceFunc s_TraceFunc = nullptr;
 static void TraceImpl(const char* fmt, ...)
 {
 	// Format the message
-	va_list list;
-	va_start(list, fmt);
-	char buffer[1024];
-	vsnprintf(buffer, sizeof(buffer), fmt, list);
-	va_end(list);
+	// va_list list;
+	// va_start(list, fmt);
+	// char buffer[1024];
+	// vsnprintf(buffer, sizeof(buffer), fmt, list);
+	// va_end(list);
 
-	// Print to the TTY
-	if (s_TraceFunc)
-	{
-		s_TraceFunc(buffer);
-	}
-	else
-	{
-		std::cout << buffer << std::endl;
-	}
+	// // Print to the TTY
+	// if (s_TraceFunc)
+	// {
+	// 	s_TraceFunc(buffer);
+	// }
+	// else
+	// {
+	// 	std::cout << buffer << std::endl;
+	// }
 }
 
 #ifdef JPH_ENABLE_ASSERTS
@@ -180,7 +180,7 @@ static bool AssertFailedImpl(const char* inExpression, const char* inMessage, co
 	}
 
 	// Print to the TTY
-	std::cout << inFile << ":" << inLine << ": (" << inExpression << ") " << (inMessage != nullptr ? inMessage : "") << std::endl;
+	// std::cout << inFile << ":" << inLine << ": (" << inExpression << ") " << (inMessage != nullptr ? inMessage : "") << std::endl;
 
 	// Breakpoint
 	return true;
